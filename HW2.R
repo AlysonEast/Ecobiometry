@@ -6,23 +6,27 @@ str(df)
 
 hist(df$abund)
 
-#1) Yes, a transforamtion is needed due to the heaxy skew of the histogram
+#1) Yes, a transformation is needed due to the heavy skew of the histogram
 df$abund<-log10(df$abund+0.1)
 
 
 pairs(df[,-2])
 cor(df[,-2])
+cor(df[,-2])[,1]
+sort(cor(df[,-2])[,1])
 
-#2) clDD and clFD are very negitivly corrialted (-0.98), as is clDD and clTmi (0.97), and clDD with clTmn (0.99)
+#2) The top three variables most highly correlated with abundance are clTma, grass, and broadleaf
+# clTma, grass are both positively correlated, and broadleaf is negatively correlated. 
+
 m<-lm(abund~clTma+NDVI+grass, data = df)
 m.scaled=lm(scale(abund)~scale(clTma)+ scale(NDVI)+
               scale(grass), data=df)
 
 summary(m)
 summary(m.scaled)
-#3) The P-values on all of the coeffiecents satayed the same between scaled and unscaped, except for the intercept, which only significant in the unscaled model
+#3) The P-values on all of the coefficients stayed the same between scaled and unscaled, except for the intercept, which only significant in the unscaled model
 
-#4) Overall model mdoel stats do not change
+#4) Overall model stats do not change
 
 #5) clTma has the greatest effect followed by grass followed by NDVI
 
@@ -55,7 +59,50 @@ dim(df)
 for (i in 1:10) {
   print(summary(lm(abund~clDD+clFD+clTmn,data = df[sample(nrow(df),100),]))) 
 }
-#9-11)Coefficient change a lot, including changing signs from one run to the next, given the high level of correlation in these varaibles this is a bouncing beta
+#9-11)Coefficient change a lot, including changing signs from one run to the next, given the high level of correlation in these variables this is a bouncing beta
+
+#Borcard partition 
+colnames(df)
+m_full<-lm(abund~clDD+clFD+clTmi+clTma+clTmn+clP+broadleaf+conif+grass+crop+urban+wetland, data = df)
+m_clim<-lm(abund~clDD+clFD+clTmi+clTma+clTmn+clP, data = df)
+m_habitat<-lm(abund~broadleaf+conif+grass+crop+urban+wetland, data = df)
+
+summary(m_full)
+1-0.6053
+summary(m_clim)
+0.6053-0.5933 #habitat only
+summary(m_habitat)
+0.6053-0.08919 #Clim only
+
+1-0.51611-0.012-0.3947
 
 
-#12)
+#12) Unexplained Variance: 0.3947
+# Climate Only: 0.51611
+# Habitat Only: 0.012
+# Both Explain: 0.07719
+
+library(lavaan)
+
+GB05Mat<-matrix(c(1006.2, -26.2, -139.4, 3636.3,
+                  -26.2, 2.722, 13.47, -170.4,
+                  -139.4, 13.47, 157.8, -1459.6,
+                  3636.3, -170.4, -1459.6, 66693), ncol=4) 
+rownames(GB05Mat)<-colnames(GB05Mat)<-c("Plant.Cover",
+                                        "Fire.Severity", "Stand.Age", "Elevation") 
+GB05Mat
+
+#13) We create a contrivance matrix with varaine on the diagonal. 
+
+
+model<-'Stand.Age~Elevation
+        Fire.Severity~Stand.Age
+        Plant.Cover~Elevation+Fire.Severity'
+
+fit<-sem(model = model, sample.cov = GB05Mat, sample.nobs = 90)
+summary(fit)
+standardizedSolution(fit) 
+
+-0.022*0.085*-7.395
+
+#14) The Estimated coefficient of direct effect is 0.036, while the indirect effect has a coefficient of 0.0138
