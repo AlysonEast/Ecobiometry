@@ -51,7 +51,7 @@ summary(step)
 
 #7b) crop and wetland were dropped from the full model, the new R-squared is 0.06062 and the p-value is still  < 2.2e-16
 
-#8) Yes, I expected the R-squared to reduce given that there were fewer varaibles, but it was a very very modest reduction
+#8) Yes, I expected the R-squared to reduce given that there were fewer variables, but it was a very very modest reduction
 
 summary(lm(abund~clDD+clFD+clTmn, data = df))
 dim(df)
@@ -92,7 +92,7 @@ rownames(GB05Mat)<-colnames(GB05Mat)<-c("Plant.Cover",
                                         "Fire.Severity", "Stand.Age", "Elevation") 
 GB05Mat
 
-#13) We create a contrivance matrix with varaine on the diagonal. 
+#13) We create a contrivance matrix with variance on the diagonal, and than assigned symmetrical row and column names
 
 
 model<-'Stand.Age~Elevation
@@ -104,5 +104,6 @@ summary(fit)
 standardizedSolution(fit) 
 
 -0.022*0.085*-7.395
+0.036+0.0138
 
-#14) The Estimated coefficient of direct effect is 0.036, while the indirect effect has a coefficient of 0.0138
+#14) The Estimated coefficient of direct effect is 0.036, while the indirect effect has a coefficient of 0.0138, making the direct effect 2.7 times stronger than the indirect effect.
