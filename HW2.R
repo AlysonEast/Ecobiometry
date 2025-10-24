@@ -24,7 +24,7 @@ m.scaled=lm(scale(abund)~scale(clTma)+ scale(NDVI)+
 
 summary(m)
 summary(m.scaled)
-#3) The P-values on all of the coefficients stayed the same between scaled and unscaled, except for the intercept, which only significant in the unscaled model
+#3) The P-values and all of the coefficients stayed the same between scaled and unscaled, except for the intercept, which only significant in the unscaled model
 
 #4) Overall model stats do not change
 
@@ -40,6 +40,9 @@ anova(temp.linear,temp.quad,temp.cubic)
 summary(temp.quad)
 
 #6) Based on the ANOVA we should use the second order model: abund~clDD+I(clDD^2) with p-value 8.279e-07 and R-Squared of 0.04
+## GRADING NOTE, NO, we should take the cubic because it is also significantly better than the quartic,
+## This is due to the fact that there is no penalization for complexity
+#### Not the best to do this. AIC is better.. Coming later
 
 full<-lm(abund~.-Present, data=df)
 summary(full)
@@ -49,7 +52,7 @@ step
 colnames(df[,-2])
 summary(step)
 
-#7b) crop and wetland were dropped from the full model, the new R-squared is 0.06062 and the p-value is still  < 2.2e-16
+#7b) crop and wetland were dropped from the full model, the new R-squared is 0.6062 and the p-value is still  < 2.2e-16
 
 #8) Yes, I expected the R-squared to reduce given that there were fewer variables, but it was a very very modest reduction
 
